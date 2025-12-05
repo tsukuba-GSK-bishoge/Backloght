@@ -724,28 +724,21 @@ tyrano.plugin.kag.tag.awakegame = {
 
         //バックログ全文をarray_logに入れる
         var array_log = that.kag.variable.tf.system.backlog;
-        let backlogJumpHtml = null;
 
         for (var i = 0; i < array_log.length; i++) {
           const log = array_log[i];
+          const match = log.match(/blj_text([0-9]+)/);
 
-          // バックログジャンプ用ボタンを検知したら保持して、次のログと横並びで配置する
-          if (log.includes("blj_text")) {
-            backlogJumpHtml = log;
+          // バックログジャンプ対象の場合は専用のボタンを出しつつ、テキストは通常のログと同じ場所に表示する
+          if (match) {
+            const backlogSerial = match[1];
+            const jumpButton = `<button type="button" class="blj_button blj_jump_button blj_text${backlogSerial}" aria-label="backlog jump">⤴</button>`;
+            const messageHtml = log.replace(/blj_text[0-9]*/g, "backlog_text");
+            log_str += `<div class="blj_row">${jumpButton}<div class="blj_message">${messageHtml}</div></div>`;
             continue;
           }
 
-          const jumpButton = backlogJumpHtml
-            ? `<div class="blj_button">${backlogJumpHtml}</div>`
-            : '<div class="blj_button blj_button-empty"></div>';
-          backlogJumpHtml = null;
-
-          log_str += `<div class="blj_row">${jumpButton}<div class="blj_message">${log}</div></div>`;
-        }
-
-        // ジャンプボタンだけが余った場合は単独で出力する
-        if (backlogJumpHtml) {
-          log_str += `<div class="blj_row"><div class="blj_button">${backlogJumpHtml}</div><div class="blj_message"></div></div>`;
+          log_str += `<div class="blj_row"><div class="blj_button blj_button-empty"></div><div class="blj_message">${log}</div></div>`;
         }
 
         layer_menu.find(".log_body").html(log_str);
