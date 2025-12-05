@@ -1,8 +1,26 @@
 /* 文字だけでなく、ブロック単位でクリックできるように */
 .backlog_text {
-	display: inline;
+        display: inline;
+}
+
+.blj_row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+}
+
+.blj_button {
+        min-width: 1.5em;
+}
+
+.blj_button-empty {
+        visibility: hidden;
+}
+
+.blj_message {
+        flex: 1;
 }
 
 .blj_text{
-	display: block;
+        display: inline-block;
 }
