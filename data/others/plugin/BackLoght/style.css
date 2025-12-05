@@ -1,35 +1,35 @@
 .blj_row {
-display: grid;
-grid-template-columns: auto 1fr;
-column-gap: 8px;
-align-items: start;
+  display: flex;
+  column-gap: 8px;
+  align-items: flex-start;
 }
 
 .blj_button {
-min-width: 1.5em;
-border: none;
-background: none;
-padding: 2px 0;
-color: inherit;
-cursor: pointer;
-display: flex;
-justify-content: center;
-align-items: center;
+  min-width: 1.5em;
+  border: none;
+  background: none;
+  padding: 2px 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .blj_jump_button {
-font-size: 1em;
+  font-size: 1em;
 }
 
 .blj_button-empty {
-visibility: hidden;
+  visibility: hidden;
 }
 
 .blj_message {
-min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .blj_message .backlog_text,
 .blj_message .blj_text{
-display: block;
+  display: block;
 }
