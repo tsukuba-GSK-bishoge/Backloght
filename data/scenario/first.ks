@@ -10,6 +10,7 @@
 @call storage="tyrano.ks"
 
 ;ゲームで必ず必要な初期化処理はこのファイルに記述するのがオススメ
+[plugin name="BackLoght"]
 
 ;メッセージボックスは非表示
 @layopt layer="message" visible=false

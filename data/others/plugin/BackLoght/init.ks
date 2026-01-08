@@ -18,13 +18,32 @@ sf.blj = {
   //default: tyrano.plugin.kag.config.maxBackLogNum
   maxSaveFileNum: tyrano.plugin.kag.config.maxBackLogNum,
 
-  //◆バックログジャンプする際に出す確認ダイアログの文字
+  //◆確認ダイアログの設定
+  //0にすると、[dialog]タグやタイトルに戻る際に表示されるようなダイアログと同じデザインになります。
+  //1にすると、javascript標準の確認ダイアログになります。フルスクリーン状態を解除してしまうので非推奨です。
+  //2にすると、確認ダイアログを表示しません。
+  //default: 0
+  confirmMode: 0,
+
+  //◆確認ダイアログで表示するテキスト
   //default: "この位置にジャンプしますか？"
-  confirmText: "この位置にジャンプしますか？"
+  confirmText: "この位置にジャンプしますか？",
+
+  //◆確認ダイアログのOKボタンで表示する文字列
+  //javascript標準のダイアログ（confimMode=1）には反映されません。
+  //default: "OK"
+  confirmOK:  "OK",
+
+
+  //◆確認ダイアログのキャンセルボタンで表示する文字列
+  //javascript標準のダイアログ（confimMode=1）には反映されません。
+  //default: "Cancel"
+  confirmCancel: "Cancel"
+
+
 
   
 }
-
 
 
 //コンフィグここまで

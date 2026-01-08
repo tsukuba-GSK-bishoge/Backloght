@@ -498,10 +498,10 @@
       //@@start
       //ロード時にそのセーブデータのバックログを読む(awakegameは除く)
       if(options.is_awakegame=="false"){
-        console.warn("バックログを読み込みました");
+        //console.warn("バックログを読み込みました");
         this.kag.variable.tf.system.backlog = this.kag.stat.f.backlog;
         tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile  = TYRANO.kag.stat.f.saveFile;
-        console.warn("f.backlogを空にしました");
+        //console.warn("f.backlogを空にしました");
         TYRANO.kag.stat.f.saveFile = []; //f変数の方は消す
         }
       //@@end
@@ -749,6 +749,8 @@ tyrano.plugin.kag.tag.awakegame = {
         $(".button_menu").hide();
 
 
+
+
         //追加箇所start------------------------------------------------
         //マウスオンの箇所をハイライト
         //@@start
@@ -766,39 +768,37 @@ tyrano.plugin.kag.tag.awakegame = {
         //マウスクリックでジャンプ
           //@@対象クラスをbacklog_text → blj_textに変更
           $(".blj_text").click((e) => {
-            console.log(e.target.className);
+            //console.log(e.target.className);
             //backlogSerialNumberの中身を取得
             let backlogSerialNumber = e.target.className.replace("blj_text", "");
           if (tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length < 0) {
-            console.log("バックログがないにも関わらずバックログジャンプを実行しようとしました。");//ないとは思うけど一応
+            //console.log("バックログがないにも関わらずバックログジャンプを実行しようとしました。");//ないとは思うけど一応
             return;
           }
-        //@@start
-            //デバッグ用
-            //saveFileのcurrent_message_strとクリックしたテキストを取得
-            //console.log("クラス名"+e.target.className);
-            //console.log("クリックしたテキスト" + e.target.textContent);                      
-            //console.log("blj_numberは" + String(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[Number(backlogSerialNumber)].stat.f.blj_number));
-            //console.log("セーブファイルのテキスト" + tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[Number(backlogSerialNumber)].stat.current_message_str);
-        //@@end
 
-          //「この位置にジャンプしますか？」という確認を出す。
-          if (confirm(String(TYRANO.kag.variable.sf.blj.confirmText))) {
-            //ロード処理
-            $('.menu_close').trigger('click');
+        //@@バックログジャンプ実行関数
+        const do_blj = () => {
+          //ロード処理
+           $('.menu_close').trigger('click');
             
             //@@start
-                //console.log("backlogSerialNumberは"+backlogSerialNumber);
                 blj_index=-1; //ジャンプするセーブデータのインデックスを格納する変数
-                //クリックしたテキストのbacklogSerialNumberと同じ値のf.blj_numberが格納されているセーブデータをsaveFileから探し、そのインデックスをblj_indexに格納する。
-                console.log("セーブファイルの長さ" + String(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length));
-                console.log("セーブファイルの検索開始");
 
+                /*
+                backlogSerialNumber（クリックしたテキストに付与されている番号）
+                と同じ値のf.blj_numbrが格納されているセーブデータを探す処理。
+                
+                ※※※
+                f.blj_numberは、[n]タグを踏む度に値が1増える。被ることはない。
+                また、バックログにテキストが挿入される際には、
+                そのテキストに「現在のf.blj_number」と同じ値のbacklogSerialNumberが付与される。
+                したがって、データがズレる（クリックしたテキストと違うデータに飛ぶ）ことはない。
+                ※※※
+                */
                 for (let i = 0; i < tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length; i++){
-                  console.log(String(i));
+                  //一致するデータを見つけたら、そのデータのインデックスを取得して終了
                   if(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[i].stat.f.blj_number == backlogSerialNumber)
                   {
-                    console.log("一致");
                     blj_index=i;
                     break;
                   }
@@ -806,7 +806,8 @@ tyrano.plugin.kag.tag.awakegame = {
                 
 
               //ロード失敗処理
-              //blj_index==-1(初期値から変わっていない)ということは、合致するセーブデータがなかったということなのでreturn。
+              //blj_index==-1(初期値から変わっていない)
+              // ということは、合致するセーブデータがなかったということなのでreturn。
                 if(blj_index==-1){
                   alert("対象のセーブデータが見つかりませんでした");
                   return;
@@ -830,13 +831,19 @@ tyrano.plugin.kag.tag.awakegame = {
 
 
                 //ロード時にそのセーブデータのバックログを読む
-                console.warn("バックログを読み込みました");
+                //console.warn("バックログを読み込みました");
                 TYRANO.kag.variable.tf.system.backlog = TYRANO.kag.stat.f.backlog;
-                console.warn("f.backlogを空にしました");
+                //console.warn("f.backlogを空にしました");
                 TYRANO.kag.stat.f.backlog = []; //f変数は消す
                 
                 //バックログジャンプを挿入する。
-                // (※[blj_record_start]や[n]はセーブしてからバックログジャンプボタンを挿入するので、ジャンプするとジャンプボタンが1つ足りなくなっている。こういう仕様にしないとスキップモードのときにうまくいかなかった……はず)
+                /*
+                ※※※
+                [blj_record_start]や[n]はセーブしてからバックログジャンプボタンを挿入するので、
+                ジャンプするとジャンプボタンが1つ足りなくなっている。
+                だから、こういう仕様にしないとうまくいかない……はず。
+                ※※※
+                */
                 TYRANO.kag.ftag.startTag("pushlog",
                   {text: `<span class="blj_text ${TYRANO.kag.stat.f.blj_number}"></span>`,
                   join: false});
@@ -845,10 +852,43 @@ tyrano.plugin.kag.tag.awakegame = {
                 for(let i=Number(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length);i > Number(blj_index)+1; i--){
                   tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.pop();
                 }
-                
 
-                //@@end
+
+
+        };
+
+      //@@ 確認ダイアログを表示するか分岐する処理
+      switch(TYRANO.kag.variable.sf.blj.confirmMode){
+        case 0:
+          //ティラノ独自のダイアログを表示
+          $(".remodal").find("#remodal-confirm").html(TYRANO.kag.variable.sf.blj.confirmOK);
+          $(".remodal").find("#remodal-cancel").html(TYRANO.kag.variable.sf.blj.confirmCancel);
+          $.confirm(
+              TYRANO.kag.variable.sf.blj.confirmText,
+              function () {
+                do_blj();
+                return;
+              },
+              function () {
+                return false;
+              },
+          );
+          break;
+        case 1:
+          //javascript標準のダイアログを表示
+          if (confirm(String(TYRANO.kag.variable.sf.blj.confirmText))) {
+            do_blj();
+            return;
+         
           }
+          break;
+        default:
+          //確認をすっ飛ばして実行
+          do_blj();
+
+      };
+
+
         });
         //追加箇所end------------------------------------------------
       },
@@ -998,7 +1038,7 @@ let _snapSave=tyrano.plugin.kag.menu.snapSave;
       //
       // サムネイルデータを作成しない場合
       //
-      console.log("debug: flag_thumbがfalseのためサムネイルデータを作成しませんでした");
+      //console.log("debug: flag_thumbがfalseのためサムネイルデータを作成しませんでした");
       var img_code = "";
       var data = {};
 
