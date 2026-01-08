@@ -721,15 +721,29 @@ tyrano.plugin.kag.tag.awakegame = {
         });
 
         var log_str = "";
+        var pendingMarker = "";
 
         //バックログ全文をarray_logに入れる
         var array_log = that.kag.variable.tf.system.backlog;
         for (var i = 0, j = 0; i < array_log.length; i++) {
           //@@start
             //displayをblockに変更しているので、divで囲む。
-            let array_log_html = $.parseHTML(array_log[i]);
-            log_str += `<div>${array_log[i]}</div>`;
+            if (array_log[i].indexOf('class="blj_text') !== -1) {
+              pendingMarker = array_log[i];
+              continue;
+            }
+
+            if (pendingMarker) {
+              log_str += `<div><span class="blj_marker">${pendingMarker}</span><span class="blj_content">${array_log[i]}</span></div>`;
+              pendingMarker = "";
+            } else {
+              log_str += `<div>${array_log[i]}</div>`;
+            }
           //@@end
+        }
+
+        if (pendingMarker) {
+          log_str += `<div><span class="blj_marker">${pendingMarker}</span></div>`;
         }
 
         layer_menu.find(".log_body").html(log_str);
@@ -813,6 +827,8 @@ tyrano.plugin.kag.tag.awakegame = {
                   return;
                 }
 
+                const currentMessage = tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.current_message_str; //現在のメッセージを代入。ロード後にログに入れる
+
                 //ジャンプ先のセーブデータがスキップモード中であるかどうかで処理が変わる
                 if(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.is_skip == true){
                 tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.is_skip = false;
@@ -821,7 +837,6 @@ tyrano.plugin.kag.tag.awakegame = {
                 //that.kag.setSkip(false);
                 }else{
                   //スキップモードがOFFの場合は、ジャンプ直後に表示されているメッセージがバックログから消えてしまう。
-                  const currentMessage = tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.current_message_str; //現在のメッセージを代入。ロード後にログに入れる
                   that.kag.setSkip(false);
                   that.loadGameData($.extend(true, {}, tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index]), { auto_next: "yes", bgm_over: "false" }, false);
                   that.kag.ftag.nextOrder();
@@ -844,9 +859,21 @@ tyrano.plugin.kag.tag.awakegame = {
                 だから、こういう仕様にしないとうまくいかない……はず。
                 ※※※
                 */
-                TYRANO.kag.ftag.startTag("pushlog",
-                  {text: `<span class="blj_text ${TYRANO.kag.stat.f.blj_number}"></span>`,
-                  join: false});
+                const markerHtml = `<span class="blj_text ${TYRANO.kag.stat.f.blj_number}"></span>`;
+                let markerInserted = false;
+                const backlogArray = TYRANO.kag.variable.tf.system.backlog;
+                if (currentMessage && Array.isArray(backlogArray) && backlogArray.length > 0) {
+                  const lastIndex = backlogArray.length - 1;
+                  if (backlogArray[lastIndex] === currentMessage) {
+                    backlogArray.splice(lastIndex, 0, markerHtml);
+                    markerInserted = true;
+                  }
+                }
+                if (!markerInserted) {
+                  TYRANO.kag.ftag.startTag("pushlog",
+                    {text: markerHtml,
+                    join: false});
+                }
                 
                 //戻った分のセーブデータを消す
                 for(let i=Number(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length);i > Number(blj_index)+1; i--){
