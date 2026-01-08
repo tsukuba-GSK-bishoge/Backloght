@@ -17,7 +17,7 @@
 // ◆ タイトル
 // ウィンドウのキャプション(タイトル)および
 // ブラウザの場合は、タイトルに指定されます
-;System.title = Backlogh
+;System.title = Backloght
 
 
 
@@ -436,7 +436,7 @@
 //     "38": "focus_up",    // ↑
 //     "39": "focus_right", // →
 //     "40": "focus_down",  // ↓
-;useKeyFocus = true;
+;useKeyFocus = false;
 
 
 // ◆ キーボードの方向キーなどでボタンを選択したときに最初にどのボタンをフォーカスするか
@@ -494,7 +494,7 @@
 
 // ◆ ゲームパッドによる操作を有効にするかどうか
 // 有効にするなら true を、無効にするなら false を指定します。
-;useGamepad = true;
+;useGamepad = false;
 
 
 

@@ -11,8 +11,6 @@
 
 ;ゲームで必ず必要な初期化処理はこのファイルに記述するのがオススメ
 
-[plugin name="Backloght"]
-
 ;メッセージボックスは非表示
 @layopt layer="message" visible=false
 
