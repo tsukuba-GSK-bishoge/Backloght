@@ -721,15 +721,29 @@ tyrano.plugin.kag.tag.awakegame = {
         });
 
         var log_str = "";
+        var pendingMarker = "";
 
         //バックログ全文をarray_logに入れる
         var array_log = that.kag.variable.tf.system.backlog;
         for (var i = 0, j = 0; i < array_log.length; i++) {
           //@@start
             //displayをblockに変更しているので、divで囲む。
-            let array_log_html = $.parseHTML(array_log[i]);
-            log_str += `<div>${array_log[i]}</div>`;
+            if (array_log[i].indexOf('class="blj_text') !== -1) {
+              pendingMarker = array_log[i];
+              continue;
+            }
+
+            if (pendingMarker) {
+              log_str += `<div><span class="blj_marker">${pendingMarker}</span><span class="blj_content">${array_log[i]}</span></div>`;
+              pendingMarker = "";
+            } else {
+              log_str += `<div>${array_log[i]}</div>`;
+            }
           //@@end
+        }
+
+        if (pendingMarker) {
+          log_str += `<div><span class="blj_marker">${pendingMarker}</span></div>`;
         }
 
         layer_menu.find(".log_body").html(log_str);
