@@ -1,32 +1,31 @@
 //諸々の関数の置き換えやバックログジャンプ用の変数定義
 (function () {
-
   /********************************************
- * ↓ tyrano.plugin.kag.tmp.BackLoght 
- *********************************************/
+   * ↓ tyrano.plugin.kag.tmp.BackLoght
+   *********************************************/
   tyrano.plugin.kag.tmp.BackLoght = {
     backlogJump: {
-      saveFile: [],//バックログジャンプに使うセーブデータの配列。最大保持数はconfig.tjsのbacklogNumに依存。
-      isCanBacklogJumpText: true,//バックログジャンプができるテキストであるかどうか。基本的にtrueで、バックログにのみ表示するテキストでだけfalse
-      pushSaveFile(pushData) {	//saveFileへの値追加。
+      saveFile: [], //バックログジャンプに使うセーブデータの配列。最大保持数はconfig.tjsのbacklogNumに依存。
+      isCanBacklogJumpText: true, //バックログジャンプができるテキストであるかどうか。基本的にtrueで、バックログにのみ表示するテキストでだけfalse
+      pushSaveFile(pushData) {
+        //saveFileへの値追加。
         //データの挿入
         this.saveFile.push(pushData);
         //tyrano.plugin.kag.config.maxBackLogNumで指定した数を超えたら古いものから削除。
         if (TYRANO.kag.variable.sf.blj.maxSaveFileNum < this.saveFile.length) {
           this.saveFile.shift();
         }
-
-      }
-    }
+      },
+    },
   };
   /********************************************
- * ↑ tyrano.plugin.kag.tmp.BackLoght
- *********************************************/
+   * ↑ tyrano.plugin.kag.tmp.BackLoght
+   *********************************************/
   /********************************************
- * ↓ tyrano.plugin.kag.tag.p 
- *********************************************/
-  let _p = tyrano.plugin.kag.tag.p
-  let _kag = tyrano.plugin.kag.ftag.master_tag.p.kag
+   * ↓ tyrano.plugin.kag.tag.p
+   *********************************************/
+  let _p = tyrano.plugin.kag.tag.p;
+  let _kag = tyrano.plugin.kag.ftag.master_tag.p.kag;
   tyrano.plugin.kag.tag.p = $.extend(true, {}, _p, {
     start: function () {
       var that = this;
@@ -43,8 +42,8 @@
 
       // スキップモードの場合は単に次のタグに進んで早期リターン
       if (this.kag.stat.is_skip == true) {
-          this.kag.ftag.nextOrder();
-          return;
+        this.kag.ftag.nextOrder();
+        return;
       }
 
       // ここに到達したということは
@@ -53,47 +52,45 @@
       // オートモード時は現在表示されているメッセージ量から待機時間を計算して
       // setTimeout で次のタグに進む
       if (this.kag.stat.is_auto == true) {
-          this.kag.stat.is_wait_auto = true;
+        this.kag.stat.is_wait_auto = true;
 
-          var auto_speed = that.kag.config.autoSpeed;
-          if (that.kag.config.autoSpeedWithText != "0") {
-              var cnt_text = this.kag.stat.current_message_str.length;
-              auto_speed = parseInt(auto_speed) + parseInt(that.kag.config.autoSpeedWithText) * cnt_text;
+        var auto_speed = that.kag.config.autoSpeed;
+        if (that.kag.config.autoSpeedWithText != "0") {
+          var cnt_text = this.kag.stat.current_message_str.length;
+          auto_speed =
+            parseInt(auto_speed) +
+            parseInt(that.kag.config.autoSpeedWithText) * cnt_text;
+        }
+
+        setTimeout(function () {
+          if (that.kag.stat.is_wait_auto == true) {
+            //ボイス再生中の場合は、オートで次に行かない。効果音再生終了後に進めるためのフラグを立てる
+            if (that.kag.tmp.is_vo_play == true) {
+              that.kag.tmp.is_vo_play_wait = true;
+            } else {
+              // クリック待ちグリフを消去
+              that.kag.ftag.hideNextImg();
+              that.kag.ftag.nextOrder();
+            }
           }
-
-          setTimeout(function () {
-              if (that.kag.stat.is_wait_auto == true) {
-                  //ボイス再生中の場合は、オートで次に行かない。効果音再生終了後に進めるためのフラグを立てる
-                  if (that.kag.tmp.is_vo_play == true) {
-                      that.kag.tmp.is_vo_play_wait = true;
-                  } else {
-                      // クリック待ちグリフを消去
-                      that.kag.ftag.hideNextImg();
-                      that.kag.ftag.nextOrder();
-                  }
-              }
-          }, auto_speed);
+        }, auto_speed);
       }
 
       // waitClick を呼んでイベントレイヤ―の表示処理などを行う
       this.kag.waitClick("p");
-
     },
-
-
-    });
+  });
   tyrano.plugin.kag.ftag.master_tag.p = tyrano.plugin.kag.tag.p;
   tyrano.plugin.kag.ftag.master_tag.p.kag = _kag;
   /********************************************
- * ↑ tyrano.plugin.kag.tag.p 
- *********************************************/
+   * ↑ tyrano.plugin.kag.tag.p
+   *********************************************/
 
   /********************************************
- * ↓ tyrano.plugin.kag.menu.loadGameData
- *********************************************/
+   * ↓ tyrano.plugin.kag.menu.loadGameData
+   *********************************************/
 
   tyrano.plugin.kag.menu.loadGameData = function (data, options) {
-
     const that = this;
 
     // ロードを始める前にイベントレイヤを非表示にする
@@ -102,26 +99,27 @@
     // ティラノイベント"load-start"を発火
     this.kag.trigger("load-start");
 
-        // 瞬きを停止
-        this.kag.chara.stopAllFrameAnimation();
+    // 瞬きを停止
+    this.kag.chara.stopAllFrameAnimation();
 
     // 一時リスナをすべて消去
     this.kag.offTempListeners();
 
     //普通のロードの場合
     if (typeof options == "undefined") {
-      options = { bgm_over: "false",
-                  is_awakegame: "false"//@@awakegameで戻って来たかを判定する属性を追加。
-                  };
+      options = {
+        bgm_over: "false",
+        is_awakegame: "false", //@@awakegameで戻って来たかを判定する属性を追加。
+      };
     } else if (typeof options.bgm_over == "undefined") {
       options["bgm_over"] = "false";
-      options["is_awakegame"] = "false";//@@awakegameで戻って来たかを判定する属性を追加。
+      options["is_awakegame"] = "false"; //@@awakegameで戻って来たかを判定する属性を追加。
     }
 
-        // [wait]中にロードされた場合の対策
-        clearTimeout(this.kag.tmp.wait_id);
-        this.kag.tmp.wait_id = "";
-        this.kag.stat.is_wait = false;
+    // [wait]中にロードされた場合の対策
+    clearTimeout(this.kag.tmp.wait_id);
+    this.kag.tmp.wait_id = "";
+    this.kag.stat.is_wait = false;
 
     /**
      * make.ks を通過してもとの場所に戻ってきたときに次のタグに進むかどうかを制御する文字列。
@@ -193,11 +191,11 @@
     // ステータスの更新
     //
 
-        //ロールバックからの呼び出しの場合
-        if (options.is_rollback == true) {
-            const tmp_checkpoint = this.kag.stat.checkpoint;
-            data.stat.checkpoint = tmp_checkpoint;
-        }
+    //ロールバックからの呼び出しの場合
+    if (options.is_rollback == true) {
+      const tmp_checkpoint = this.kag.stat.checkpoint;
+      data.stat.checkpoint = tmp_checkpoint;
+    }
 
     this.kag.stat = data.stat;
 
@@ -245,8 +243,6 @@
         }
 
         this.kag.ftag.startTag("playbgm", pm);
-
-
       }
 
       // ループSE
@@ -256,7 +252,6 @@
         pm_obj["stop"] = "true";
         this.kag.ftag.startTag("playbgm", pm_obj);
       }
-
     }
 
     //読み込んだCSSがある場合
@@ -325,23 +320,22 @@
 
         //アニメーションの実行
         if (key == "layer_camera") {
-
           $(".layer_camera").css("-webkit-transform-origin", "center center");
           (function (_a3d_define) {
             setTimeout(function () {
               $(".layer_camera").a3d(a3d_define);
             }, 1);
           })(a3d_define);
-
         } else {
-
-          $("." + key + "_fore").css("-webkit-transform-origin", "center center");
+          $("." + key + "_fore").css(
+            "-webkit-transform-origin",
+            "center center"
+          );
           (function (_a3d_define) {
             setTimeout(function () {
               $("." + key + "_fore").a3d(_a3d_define);
             }, 1);
           })(a3d_define);
-
         }
       }
     }
@@ -469,14 +463,11 @@
     // ※ this.kag.tmp に影響はない
     this.kag.clearTmpVariable();
 
-
-    
     // ロード直後なのだから、セーブ時の状態がどうであったにせよいまはアニメーションスタック数はゼロであるべき
     // ウェイト状態やトランス待機状態であるはずもない
     this.kag.tmp.num_anim = 0;
     this.kag.stat.is_wait = false;
     this.kag.stat.is_stop = false;
-
 
     //
     // make.ksを通過してからもとのシナリオファイル＋タグインデックスに戻る処理
@@ -497,19 +488,23 @@
       };
       //@@start
       //ロード時にそのセーブデータのバックログを読む(awakegameは除く)
-      if(options.is_awakegame=="false"){
+      if (options.is_awakegame == "false") {
         //console.warn("バックログを読み込みました");
         this.kag.variable.tf.system.backlog = this.kag.stat.f.backlog;
-        tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile  = TYRANO.kag.stat.f.saveFile;
+        tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile =
+          TYRANO.kag.stat.f.saveFile;
         //console.warn("f.backlogを空にしました");
         TYRANO.kag.stat.f.saveFile = []; //f変数の方は消す
-        }
+      }
       //@@end
-            
-      this.kag.ftag.nextOrderWithIndex(data.current_order_index, data.stat.current_scenario, true, insert, "yes");
 
-
-
+      this.kag.ftag.nextOrderWithIndex(
+        data.current_order_index,
+        data.stat.current_scenario,
+        true,
+        insert,
+        "yes"
+      );
     };
 
     // make.ks に行く前にプリロードをする必要があるものはこの配列にぶち込んでいく
@@ -530,7 +525,10 @@
             // 存在していない！
             preload_targets.push((callback) => {
               $.get(file_path, (xml) => {
-                $(xml).find("svg").attr("id", file_path).appendTo(j_hidden_area);
+                $(xml)
+                  .find("svg")
+                  .attr("id", file_path)
+                  .appendTo(j_hidden_area);
                 callback();
               });
             });
@@ -603,11 +601,11 @@
   };
 
   /********************************************
- * ↑ tyrano.plugin.kag.menu.loadGameData
- *********************************************/
+   * ↑ tyrano.plugin.kag.menu.loadGameData
+   *********************************************/
   /**********************************************
- * ↓ tyrano.plugin.kag.tag.awakegame
- *********************************************/
+   * ↓ tyrano.plugin.kag.tag.awakegame
+   *********************************************/
 
   /*
 #[awakegame]
@@ -637,58 +635,57 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
 #[end]
 */
 
-tyrano.plugin.kag.tag.awakegame = {
-  vital: [],
+  tyrano.plugin.kag.tag.awakegame = {
+    vital: [],
 
-  pm: {
+    pm: {
       variable_over: "true", // f変数を引き継ぐか
       sound_opt_over: "true", // stat の map_se_volume, map_bgm_volume を引き継ぐか
       bgm_over: "true",
-  },
+    },
 
-  start: function (pm) {
+    start: function (pm) {
       var that = this;
 
       if (this.kag.tmp.sleep_game == null) {
-          //this.kag.error("保存されたゲームがありません。[awakegame]タグは無効です");
-          //データがない場合はそのまま次の命令へ
-          this.kag.ftag.nextOrder();
+        //this.kag.error("保存されたゲームがありません。[awakegame]タグは無効です");
+        //データがない場合はそのまま次の命令へ
+        this.kag.ftag.nextOrder();
       } else {
-          var sleep_data = this.kag.tmp.sleep_game;
+        var sleep_data = this.kag.tmp.sleep_game;
 
-          //f変数を継承する
-          if (pm.variable_over == "true") {
-              sleep_data.stat.f = this.kag.stat.f;
-          }
+        //f変数を継承する
+        if (pm.variable_over == "true") {
+          sleep_data.stat.f = this.kag.stat.f;
+        }
 
-          if (pm.sound_opt_over === "true") {
-              sleep_data.stat.map_se_volume = this.kag.stat.map_se_volume;
-              sleep_data.stat.map_bgm_volume = this.kag.stat.map_bgm_volume;
-          }
+        if (pm.sound_opt_over === "true") {
+          sleep_data.stat.map_se_volume = this.kag.stat.map_se_volume;
+          sleep_data.stat.map_bgm_volume = this.kag.stat.map_bgm_volume;
+        }
 
-          var options = {
-              bgm_over: pm.bgm_over,
-              is_awakegame: "true",//@@awakegameによって呼ばれていることがわかるようにオプションを追加。
-          };
-          
+        var options = {
+          bgm_over: pm.bgm_over,
+          is_awakegame: "true", //@@awakegameによって呼ばれていることがわかるようにオプションを追加。
+        };
 
-          if (this.kag.tmp.sleep_game_next == true) {
-              options["auto_next"] = "yes";
-          }
+        if (this.kag.tmp.sleep_game_next == true) {
+          options["auto_next"] = "yes";
+        }
 
-          this.kag.menu.loadGameData($.extend(true, {}, sleep_data), options);
+        this.kag.menu.loadGameData($.extend(true, {}, sleep_data), options);
 
-          this.kag.tmp.sleep_game = null;
+        this.kag.tmp.sleep_game = null;
       }
-  },
-};
-/**********************************************
- * ↑ tyrano.plugin.kag.tag.awakegame 
- *********************************************/
+    },
+  };
+  /**********************************************
+   * ↑ tyrano.plugin.kag.tag.awakegame
+   *********************************************/
 
   /**********************************************
- * ↓ tyrano.plugin.kag.menu.displayLog  
- *********************************************/
+   * ↓ tyrano.plugin.kag.menu.displayLog
+   *********************************************/
   //バックログ画面表示
   tyrano.plugin.kag.menu.displayLog = function () {
     var that = this;
@@ -727,18 +724,18 @@ tyrano.plugin.kag.tag.awakegame = {
         var array_log = that.kag.variable.tf.system.backlog;
         for (var i = 0, j = 0; i < array_log.length; i++) {
           //@@start
-            //displayをblockに変更しているので、divで囲む。
-            if (array_log[i].indexOf('class="blj_text') !== -1) {
-              pendingMarker = array_log[i];
-              continue;
-            }
+          //displayをblockに変更しているので、divで囲む。
+          if (array_log[i].indexOf('class="blj_text') !== -1) {
+            pendingMarker = array_log[i];
+            continue;
+          }
 
-            if (pendingMarker) {
-              log_str += `<div><span class="blj_marker">${pendingMarker}</span><span class="blj_content">${array_log[i]}</span></div>`;
-              pendingMarker = "";
-            } else {
-              log_str += `<div>${array_log[i]}</div>`;
-            }
+          if (pendingMarker) {
+            log_str += `<div><span class="blj_marker">${pendingMarker}</span><span class="blj_content">${array_log[i]}</span></div>`;
+            pendingMarker = "";
+          } else {
+            log_str += `<div>${array_log[i]}</div>`;
+          }
           //@@end
         }
 
@@ -748,7 +745,9 @@ tyrano.plugin.kag.tag.awakegame = {
 
         layer_menu.find(".log_body").html(log_str);
 
-        layer_menu.find(".log_body").css("font-family", that.kag.config.userFace);
+        layer_menu
+          .find(".log_body")
+          .css("font-family", that.kag.config.userFace);
 
         $.preloadImgCallback(
           layer_menu,
@@ -757,51 +756,48 @@ tyrano.plugin.kag.tag.awakegame = {
             //一番下固定させる
             layer_menu.find(".log_body").scrollTop(9999999999);
           },
-          that,
+          that
         );
 
         $(".button_menu").hide();
 
-
-
-
         //追加箇所start------------------------------------------------
         //マウスオンの箇所をハイライト
         //@@start
-          //対象クラスをbacklog_text → blj_textに変更
-          $(".blj_text").hover(
+        //対象クラスをbacklog_text → blj_textに変更
+        $(".blj_text").hover(
           //@@end
-            function () {
-              $(this).css("background-color", "rgba(0, 0, 255, 0.1)");
-            },
-            function () {
-              $(this).css("background-color", "rgba(255, 255, 255, 0)");
-            }
-          );
+          function () {
+            $(this).css("background-color", "rgba(0, 0, 255, 0.1)");
+          },
+          function () {
+            $(this).css("background-color", "rgba(255, 255, 255, 0)");
+          }
+        );
 
         //マウスクリックでジャンプ
-          //@@対象クラスをbacklog_text → blj_textに変更
-          $(".blj_text").click((e) => {
-            //console.log(e.target.className);
-            //backlogSerialNumberの中身を取得
-            let backlogSerialNumber = e.target.className.replace("blj_text", "");
+        //@@対象クラスをbacklog_text → blj_textに変更
+        $(".blj_text").click((e) => {
+          //console.log(e.target.className);
+          //backlogSerialNumberの中身を取得
+          let backlogSerialNumber = e.target.className.replace("blj_text", "");
           if (tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length < 0) {
             //console.log("バックログがないにも関わらずバックログジャンプを実行しようとしました。");//ないとは思うけど一応
             return;
           }
 
-        //@@バックログジャンプ実行関数
-        const do_blj = () => {
-          //ロード処理
-           $('.menu_close').trigger('click');
-            
-            //@@start
-                blj_index=-1; //ジャンプするセーブデータのインデックスを格納する変数
+          //@@バックログジャンプ実行関数
+          const do_blj = () => {
+            //ロード処理
+            $(".menu_close").trigger("click");
 
-                /*
+            //@@start
+            blj_index = -1; //ジャンプするセーブデータのインデックスを格納する変数
+
+            /*
                 backlogSerialNumber（クリックしたテキストに付与されている番号）
                 と同じ値のf.blj_numbrが格納されているセーブデータを探す処理。
-                
+
                 ※※※
                 f.blj_numberは、[n]タグを踏む度に値が1増える。被ることはない。
                 また、バックログにテキストが挿入される際には、
@@ -809,200 +805,232 @@ tyrano.plugin.kag.tag.awakegame = {
                 したがって、データがズレる（クリックしたテキストと違うデータに飛ぶ）ことはない。
                 ※※※
                 */
-                for (let i = 0; i < tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length; i++){
-                  //一致するデータを見つけたら、そのデータのインデックスを取得して終了
-                  if(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[i].stat.f.blj_number == backlogSerialNumber)
-                  {
-                    blj_index=i;
-                    break;
-                  }
-                }
-                
+            for (
+              let i = 0;
+              i < tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length;
+              i++
+            ) {
+              //一致するデータを見つけたら、そのデータのインデックスを取得して終了
+              if (
+                tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[i].stat.f
+                  .blj_number == backlogSerialNumber
+              ) {
+                blj_index = i;
+                break;
+              }
+            }
 
-              //ロード失敗処理
-              //blj_index==-1(初期値から変わっていない)
-              // ということは、合致するセーブデータがなかったということなのでreturn。
-                if(blj_index==-1){
-                  alert("対象のセーブデータが見つかりませんでした");
-                  return;
-                }
+            //ロード失敗処理
+            //blj_index==-1(初期値から変わっていない)
+            // ということは、合致するセーブデータがなかったということなのでreturn。
+            if (blj_index == -1) {
+              alert("対象のセーブデータが見つかりませんでした");
+              return;
+            }
 
-                //ジャンプ先のセーブデータがスキップモード中であるかどうかで処理が変わる
-                if(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.is_skip == true){
-                tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.is_skip = false;
-                that.kag.setSkip(false);
-                that.loadGameData($.extend(true, {}, tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index]), { auto_next: "yes", bgm_over: "false" }, false);
-                //that.kag.setSkip(false);
-                }else{
-                  //スキップモードがOFFの場合は、ジャンプ直後に表示されているメッセージがバックログから消えてしまう。
-                  const currentMessage = tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index].stat.current_message_str; //現在のメッセージを代入。ロード後にログに入れる
-                  that.kag.setSkip(false);
-                  that.loadGameData($.extend(true, {}, tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index]), { auto_next: "yes", bgm_over: "false" }, false);
-                  that.kag.ftag.nextOrder();
-                  //that.kag.setSkip(false);
-                }
-              
+            //ジャンプ先のセーブデータがスキップモード中であるかどうかで処理が変わる
+            if (
+              tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index]
+                .stat.is_skip == true
+            ) {
+              tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[
+                blj_index
+              ].stat.is_skip = false;
+              that.kag.setSkip(false);
+              that.loadGameData(
+                $.extend(
+                  true,
+                  {},
+                  tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[
+                    blj_index
+                  ]
+                ),
+                { auto_next: "yes", bgm_over: "false" },
+                false
+              );
+              //that.kag.setSkip(false);
+            } else {
+              //スキップモードがOFFの場合は、ジャンプ直後に表示されているメッセージがバックログから消えてしまう。
+              const currentMessage =
+                tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[blj_index]
+                  .stat.current_message_str; //現在のメッセージを代入。ロード後にログに入れる
+              that.kag.setSkip(false);
+              that.loadGameData(
+                $.extend(
+                  true,
+                  {},
+                  tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[
+                    blj_index
+                  ]
+                ),
+                { auto_next: "yes", bgm_over: "false" },
+                false
+              );
+              that.kag.ftag.nextOrder();
+              //that.kag.setSkip(false);
+            }
 
+            //ロード時にそのセーブデータのバックログを読む
+            //console.warn("バックログを読み込みました");
+            TYRANO.kag.variable.tf.system.backlog = TYRANO.kag.stat.f.backlog;
+            //console.warn("f.backlogを空にしました");
+            TYRANO.kag.stat.f.backlog = []; //f変数は消す
 
-                //ロード時にそのセーブデータのバックログを読む
-                //console.warn("バックログを読み込みました");
-                TYRANO.kag.variable.tf.system.backlog = TYRANO.kag.stat.f.backlog;
-                //console.warn("f.backlogを空にしました");
-                TYRANO.kag.stat.f.backlog = []; //f変数は消す
-                
-                //バックログジャンプを挿入する。
-                /*
+            //バックログジャンプを挿入する。
+            /*
                 ※※※
                 [blj_record_start]や[n]はセーブしてからバックログジャンプボタンを挿入するので、
                 ジャンプするとジャンプボタンが1つ足りなくなっている。
                 だから、こういう仕様にしないとうまくいかない……はず。
                 ※※※
                 */
-                TYRANO.kag.ftag.startTag("pushlog",
-                  {text: `<span class="blj_text ${TYRANO.kag.stat.f.blj_number}"></span>`,
-                  join: false});
-                
-                //戻った分のセーブデータを消す
-                for(let i=Number(tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length);i > Number(blj_index)+1; i--){
-                  tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.pop();
+            TYRANO.kag.ftag.startTag("pushlog", {
+              text: `<span class="blj_text ${TYRANO.kag.stat.f.blj_number}"></span>`,
+              join: false,
+            });
+
+            //戻った分のセーブデータを消す
+            for (
+              let i = Number(
+                tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.length
+              );
+              i > Number(blj_index) + 1;
+              i--
+            ) {
+              tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile.pop();
+            }
+          };
+
+          //@@ 確認ダイアログを表示するか分岐する処理
+          switch (TYRANO.kag.variable.sf.blj.confirmMode) {
+            case 0:
+              //ティラノ独自のダイアログを表示
+              $(".remodal")
+                .find("#remodal-confirm")
+                .html(TYRANO.kag.variable.sf.blj.confirmOK);
+              $(".remodal")
+                .find("#remodal-cancel")
+                .html(TYRANO.kag.variable.sf.blj.confirmCancel);
+              $.confirm(
+                TYRANO.kag.variable.sf.blj.confirmText,
+                function () {
+                  do_blj();
+                  return;
+                },
+                function () {
+                  return false;
                 }
-
-
-
-        };
-
-      //@@ 確認ダイアログを表示するか分岐する処理
-      switch(TYRANO.kag.variable.sf.blj.confirmMode){
-        case 0:
-          //ティラノ独自のダイアログを表示
-          $(".remodal").find("#remodal-confirm").html(TYRANO.kag.variable.sf.blj.confirmOK);
-          $(".remodal").find("#remodal-cancel").html(TYRANO.kag.variable.sf.blj.confirmCancel);
-          $.confirm(
-              TYRANO.kag.variable.sf.blj.confirmText,
-              function () {
+              );
+              break;
+            case 1:
+              //javascript標準のダイアログを表示
+              if (confirm(String(TYRANO.kag.variable.sf.blj.confirmText))) {
                 do_blj();
                 return;
-              },
-              function () {
-                return false;
-              },
-          );
-          break;
-        case 1:
-          //javascript標準のダイアログを表示
-          if (confirm(String(TYRANO.kag.variable.sf.blj.confirmText))) {
-            do_blj();
-            return;
-         
+              }
+              break;
+            default:
+              //確認をすっ飛ばして実行
+              do_blj();
           }
-          break;
-        default:
-          //確認をすっ飛ばして実行
-          do_blj();
-
-      };
-
-
         });
         //追加箇所end------------------------------------------------
-      },
+      }
     );
   };
 
   /**********************************************
- * ↑ tyrano.plugin.kag.menu.displayLog  
- *********************************************/
+   * ↑ tyrano.plugin.kag.menu.displayLog
+   *********************************************/
 
-/**********************************************
- * ↓ tyrano.plugin.kag.menu.doSave 
- *********************************************/
-//@@オリジナル関数を保存。
-let _doSave= tyrano.plugin.kag.menu.doSave;
+  /**********************************************
+   * ↓ tyrano.plugin.kag.menu.doSave
+   *********************************************/
+  //@@オリジナル関数を保存。
+  let _doSave = tyrano.plugin.kag.menu.doSave;
 
-//セーブを実行する
+  //セーブを実行する
   tyrano.plugin.kag.menu.doSave = function (num, cb) {
- 
     //@@バックログの中身をセーブデータに保存する。
     this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
 
     //@@バックログジャンプ用のセーブファイルの配列もセーブデータに保存する。
-    this.kag.stat.f.saveFile = tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile;
-    
+    this.kag.stat.f.saveFile =
+      tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile;
+
     //@@元の関数を呼び出す。
-    _doSave.apply(this,arguments);
+    _doSave.apply(this, arguments);
 
     //f.saveFileを消す
-    this.kag.stat.f.backlog=[]
-    this.kag.stat.f.saveFile=[]
+    this.kag.stat.f.backlog = [];
+    this.kag.stat.f.saveFile = [];
+  };
+  /**********************************************
+   * ↑ tyrano.plugin.kag.menu.doSave
+   *********************************************/
+  /**********************************************
+   * ↓ [savesnap]
+   *********************************************/
 
-  }
-/**********************************************
- * ↑ tyrano.plugin.kag.menu.doSave 
- *********************************************/
-/**********************************************
- * ↓ [savesnap]
- *********************************************/
+  //[savesnap]
+  //セーブスナップの保存
+  tyrano.plugin.kag.tag.savesnap = {
+    vital: ["title"],
 
-//[savesnap]
-//セーブスナップの保存
-tyrano.plugin.kag.tag.savesnap = {
-  vital: ["title"],
-
-  pm: {
+    pm: {
       title: "",
       //@@start
       //flag_thumb: サムネイルを保存するか。デフォルトはconfigのconfigThumbnailに従う。
       flag_thumb: "",
       //@@end
-  },
+    },
 
-  
-  //@@start
-  //送る属性にflag_thumを追加。
-  start: function (pm) {
+    //@@start
+    //送る属性にflag_thumを追加。
+    start: function (pm) {
       var that = this;
-      this.kag.menu.snapSave(pm.title, function () {
+      this.kag.menu.snapSave(
+        pm.title,
+        function () {
           that.kag.ftag.nextOrder();
-      }, pm.flag_thumb);
-  },
+        },
+        pm.flag_thumb
+      );
+    },
+    //@@end
+  };
+
+  //@@start
+  //[savesnap]上書き処理
+  tyrano.plugin.kag.ftag.master_tag.savesnap = tyrano.plugin.kag.tag.savesnap;
+  tyrano.plugin.kag.ftag.master_tag.savesnap.kag = _kag;
   //@@end
-};
 
-//@@start
-//[savesnap]上書き処理
-tyrano.plugin.kag.ftag.master_tag.savesnap = tyrano.plugin.kag.tag.savesnap;
-tyrano.plugin.kag.ftag.master_tag.savesnap.kag = _kag;
-//@@end
+  /**********************************************
+   * ↑ [savesnap]
+   *********************************************/
 
-
-/**********************************************
- * ↑ [savesnap] 
- *********************************************/
-
-
-/**********************************************
- * ↓ tyrano.plugin.kag.menu.snapSave 
- *********************************************/
-let _snapSave=tyrano.plugin.kag.menu.snapSave;
+  /**********************************************
+   * ↓ tyrano.plugin.kag.menu.snapSave
+   *********************************************/
+  let _snapSave = tyrano.plugin.kag.menu.snapSave;
   //セーブ状態のスナップを保存します。
   tyrano.plugin.kag.menu.snapSave = function (title, call_back, flag_thumb) {
-   
-  //@@start
-      //バックログの中身をセーブデータに保存する。
-      this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
+    //@@start
+    //バックログの中身をセーブデータに保存する。
+    this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
 
-      if (typeof flag_thumb == "undefined") {
-        flag_thumb = this.kag.config.configThumbnail;
-      }
+    if (typeof flag_thumb == "undefined") {
+      flag_thumb = this.kag.config.configThumbnail;
+    }
 
-      //flag_thumがfalseならオリジナルの関数を呼んでreturn
-      if(flag_thumb=="true")
-        {
-          _snapSave.apply(this,arguments);
-          return;
-        }
-  //@@end
-    
+    //flag_thumがfalseならオリジナルの関数を呼んでreturn
+    if (flag_thumb == "true") {
+      _snapSave.apply(this, arguments);
+      return;
+    }
+    //@@end
+
     // ティラノイベント"snapsave-start"を発火
     var that = this;
     this.kag.trigger("snapsave-start");
@@ -1029,24 +1057,23 @@ let _snapSave=tyrano.plugin.kag.menu.snapSave;
     }
 
     three_save.models = save_models;
-    
+
     /////////////////////////////////////////////////////////////
 
-        // [anim wait="false"]中のセーブ対策
-        // アニメーションを強制的に完了させる
-        $(".tyrano-anim").each(function () {
-            $(this).stop(true, true);
-        });
+    // [anim wait="false"]中のセーブ対策
+    // アニメーションを強制的に完了させる
+    $(".tyrano-anim").each(function () {
+      $(this).stop(true, true);
+    });
 
-        // [chara_mod wait="false"]中のセーブ対策
-        // 表情変更中にセーブが実行された場合は表情変更を強制的に完了させる
-        $(".chara-mod-animation").each(function () {
-            const j_old = $(this);
-            const j_new = j_old.next();
-            j_old.remove();
-            j_new.stop(true, true);
-        });
-
+    // [chara_mod wait="false"]中のセーブ対策
+    // 表情変更中にセーブが実行された場合は表情変更を強制的に完了させる
+    $(".chara-mod-animation").each(function () {
+      const j_old = $(this);
+      const j_new = j_old.next();
+      j_old.remove();
+      j_new.stop(true, true);
+    });
 
     if (flag_thumb == "false") {
       //
@@ -1113,7 +1140,7 @@ let _snapSave=tyrano.plugin.kag.menu.snapSave;
           if (title === "backlogJump") {
             tyrano.plugin.kag.tmp.BackLoght.backlogJump.pushSaveFile(that.snap);
           }
-          //追加箇所end------------------------------------------------	
+          //追加箇所end------------------------------------------------
           if (call_back) {
             call_back();
 
@@ -1143,7 +1170,7 @@ let _snapSave=tyrano.plugin.kag.menu.snapSave;
 
             completeImage(img_code);
           };
-        } else{
+        } else {
           //
           // html2canvas.jsでゲーム画面のキャプチャを実行する場合
           //
@@ -1224,7 +1251,9 @@ let _snapSave=tyrano.plugin.kag.menu.snapSave;
 
           html2canvas(tmp_base.get(0), opt).then(function (canvas) {
             $("#tyrano_base").find(".layer_blend_mode").css("display", "");
-            $("#tyrano_base").find(".tmp_video_canvas").css("backgroundImage", "");
+            $("#tyrano_base")
+              .find(".tmp_video_canvas")
+              .css("backgroundImage", "");
 
             // キャプチャした画像をDOMに追加してクオリティチェック
             // コメントトグル:  ⌘ + /  または  Ctrl + /
@@ -1257,40 +1286,38 @@ let _snapSave=tyrano.plugin.kag.menu.snapSave;
     }
   };
   /**********************************************
- * ↑ tyrano.plugin.kag.menu.snapSave 
- *********************************************/
+   * ↑ tyrano.plugin.kag.menu.snapSave
+   *********************************************/
   /**********************************************
- * ↓ tyrano.plugin.kag.menu.setQuickSave 
- *********************************************/
+   * ↓ tyrano.plugin.kag.menu.setQuickSave
+   *********************************************/
   let _setQuickSave = tyrano.plugin.kag.menu.setQuickSave;
   tyrano.plugin.kag.menu.setQuickSave = function () {
     //@@start
-      //バックログとセーブファイルを保存する。
-      this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
-      this.kag.stat.f.saveFile = tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile;
-      //元の関数を呼び出す。
-      _setQuickSave.apply(this,arguments);
-      //処理終了後にf.backlogは空にしておく
-      this.kag.stat.f.backlog=[];
-      this.kag.stat.f.saveFile = [];
+    //バックログとセーブファイルを保存する。
+    this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
+    this.kag.stat.f.saveFile =
+      tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile;
+    //元の関数を呼び出す。
+    _setQuickSave.apply(this, arguments);
+    //処理終了後にf.backlogは空にしておく
+    this.kag.stat.f.backlog = [];
+    this.kag.stat.f.saveFile = [];
     //@@end
-
-}
+  };
   /**********************************************
- * ↑ tyrano.plugin.kag.menu.setQuickSave
- *********************************************/
+   * ↑ tyrano.plugin.kag.menu.setQuickSave
+   *********************************************/
   let _doSetAutoSave = tyrano.plugin.kag.menu.doSetAutoSave;
   tyrano.plugin.kag.menu.doSetAutoSave = function () {
-      //バックログとセーブファイルを保存する。
-      this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
-      this.kag.stat.f.saveFile = tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile;
-      //元の関数を呼び出す。
-      _doSetAutoSave.apply(this,arguments); 
-      //処理終了後にf.backlogは空にしておく
-      this.kag.stat.f.backlog=[];
-      this.kag.stat.f.saveFile = [];
-  }
-
-
-
-}());
+    //バックログとセーブファイルを保存する。
+    this.kag.stat.f.backlog = this.kag.variable.tf.system.backlog;
+    this.kag.stat.f.saveFile =
+      tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile;
+    //元の関数を呼び出す。
+    _doSetAutoSave.apply(this, arguments);
+    //処理終了後にf.backlogは空にしておく
+    this.kag.stat.f.backlog = [];
+    this.kag.stat.f.saveFile = [];
+  };
+})();

@@ -1,16 +1,16 @@
 /* 文字だけでなく、ブロック単位でクリックできるように */
 .backlog_text {
-	display: inline;
+  display: inline;
 }
 
-.blj_text{
-	display: inline-block;
-	margin-right: 0.4em;
-	vertical-align: middle;
+.blj_text {
+  display: inline-block;
+  margin-right: 0.4em;
+  vertical-align: middle;
 }
 
 .blj_marker,
-.blj_content{
-	display: inline-block;
-	vertical-align: middle;
+.blj_content {
+  display: inline-block;
+  vertical-align: middle;
 }

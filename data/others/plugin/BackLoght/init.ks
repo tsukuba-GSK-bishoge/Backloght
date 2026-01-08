@@ -7,12 +7,12 @@
 
 //各種コンフィグ
 sf.blj = {
-  
+
   //◆バックログジャンプボタンとして挿入する文字列
   //htmlタグを使うことで画像なども挿入可能です
   //default: "↪"
   pushtext:"↪",
-  
+
   //◆バックログジャンプで戻れるメッセージの数。
   //デフォルトはconfig.tjsのバックログ上限の設定に合わせます。
   //default: tyrano.plugin.kag.config.maxBackLogNum
@@ -42,7 +42,7 @@ sf.blj = {
 
 
 
-  
+
 }
 
 
