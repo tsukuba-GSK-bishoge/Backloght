@@ -11,7 +11,7 @@ sf.blj = {
   //◆バックログジャンプボタンとして挿入する文字列
   //htmlタグを使うことで画像なども挿入可能です
   //default: "↪"
-  pushtext:"↪",
+  pushtext:" ↪ ",
 
   //◆バックログジャンプで戻れるメッセージの数。
   //デフォルトはconfig.tjsのバックログ上限の設定に合わせます。
@@ -61,11 +61,7 @@ sf.blj = {
   if (typeof f.blj_number === "undefined" || isNaN(f.blj_number)||f.blj_number==tyrano.plugin.kag.config.maxBackLogNum) {
     f.blj_number = 0;
   }
-  let w_count = 0;//wを踏んだ回数
-    if (typeof f.w_count === "undefined" || isNaN(f.w_count)) {
-    f.w_count = 0;
-  }
-  this.kag.pushBackLog(`<span class="blj_text ${Number(f.blj_number)}">${sf.blj.pushtext}</span>`, "add");
+  this.kag.pushBackLog(`<span class="blj"><span class="blj_text ${Number(f.blj_number)}">${sf.blj.pushtext}</span></span>`, "add");
   f.is_blj_record=true;
   f.saveFile=[];
 
@@ -82,7 +78,6 @@ sf.blj = {
 ;[n]
 [macro name="n"]
   ;[wait time="10" cond="!TYRANO.kag.stat.is_skip"]
-  [eval exp="f.w_count=0"]
   [p]
   [if exp="f.is_blj_record"]
     [wait time="10" cond="!TYRANO.kag.stat.is_skip"]
@@ -90,7 +85,7 @@ sf.blj = {
     [iscript]
             f=TYRANO.kag.stat.f;//一応定義
             f.blj_number += 1;
-            this.kag.pushBackLog(`<span class="blj_text ${Number(f.blj_number)}">${sf.blj.pushtext}</span>`, "add");
+            this.kag.pushBackLog(`<span class="blj"><span class="blj_text ${Number(f.blj_number)}">${sf.blj.pushtext}</span></span>`, "add");
     [endscript]
     [savesnap title="backlogJump" flag_thumb="false"]
     [wait time="10" cond="!TYRANO.kag.stat.is_skip"]

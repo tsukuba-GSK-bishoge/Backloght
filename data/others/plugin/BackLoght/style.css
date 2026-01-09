@@ -1,13 +1,34 @@
 /* 文字だけでなく、ブロック単位でクリックできるように */
+/*
+.backlog_chara_name{
+  display: inline;
+}
+*/
+
+.blj{
+  display: inline-flex;
+  margin-right: 1.0em;
+  vertical-align: middle;
+}
+.kara {
+  opacity: 0;
+
+}
+.blj_con {
+  display: flex;
+  margin-bottom:30px;
+}
 .backlog_text {
   display: inline;
 }
 
+/*
 .blj_text {
-  display: inline-block;
-  margin-right: 0.4em;
+  display: inline-flex;
+  margin-right: 1.0em;
   vertical-align: middle;
 }
+*/
 
 .blj_marker,
 .blj_content {

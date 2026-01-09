@@ -727,21 +727,36 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
           //displayをblockに変更しているので、divで囲む。
           if (array_log[i].indexOf('class="blj_text') !== -1) {
             pendingMarker = array_log[i];
+
+          
+            if(array_log[i].indexOf(`>${TYRANO.kag.variable.sf.blj.pushtext}</span></span><`) !== -1){
+            log_str += `<div class="blj_con">${array_log[i]}</div>`;
+            console.log("〇"+String(i)+String(array_log[i]));
             continue;
+
+            }
+            console.log("✖"+String(i)+String(array_log[i]));
+            continue;
+
           }
 
           if (pendingMarker) {
-            log_str += `<div><span class="blj_marker">${pendingMarker}</span><span class="blj_content">${array_log[i]}</span></div>`;
+            log_str += `<div class="blj_con"><span class="blj_marker">${pendingMarker}</span><span class="blj_content">${array_log[i]}</span></div>`;
             pendingMarker = "";
+            console.log("〇"+String(i)+String(array_log[i]));
           } else {
-            log_str += `<div>${array_log[i]}</div>`;
+            log_str += `<div class="blj_con"><span class="blj"><span class="kara">${TYRANO.kag.variable.sf.blj.pushtext}</span></span>${array_log[i]}</div>`;
+            console.log(String(i));
           }
           //@@end
         }
 
+/*        
         if (pendingMarker) {
           log_str += `<div><span class="blj_marker">${pendingMarker}</span></div>`;
         }
+*/        
+        
 
         layer_menu.find(".log_body").html(log_str);
 
@@ -842,7 +857,7 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
                   true,
                   {},
                   tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[
-                    blj_index
+                  blj_index
                   ]
                 ),
                 { auto_next: "yes", bgm_over: "false" },
@@ -860,7 +875,7 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
                   true,
                   {},
                   tyrano.plugin.kag.tmp.BackLoght.backlogJump.saveFile[
-                    blj_index
+                  blj_index
                   ]
                 ),
                 { auto_next: "yes", bgm_over: "false" },
@@ -884,10 +899,12 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
                 だから、こういう仕様にしないとうまくいかない……はず。
                 ※※※
                 */
+            /*
             TYRANO.kag.ftag.startTag("pushlog", {
               text: `<span class="blj_text ${TYRANO.kag.stat.f.blj_number}"></span>`,
               join: false,
             });
+            */
 
             //戻った分のセーブデータを消す
             for (
@@ -941,6 +958,38 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
 
   /**********************************************
    * ↑ tyrano.plugin.kag.menu.displayLog
+   *********************************************/
+    /**********************************************
+   * ↓ tyrano.plugin.kag.tag.text.pushTextToBackLog
+   *********************************************/
+
+  tyrano.plugin.kag.tag.text.pushTextToBackLog = function (chara_name, message_str) {
+    // ひとつ前のログに連結させるべきかどうか
+    // たとえば[r][font][delay]などのタグを通過したあとは連結が有効になる
+    var should_join_log = this.kag.stat.log_join == "true";
+
+    // バックログへの追加
+    if ((chara_name != "" && !should_join_log) || (chara_name != "" && this.kag.stat.f_chara_ptext == "true")) {
+      // バックログにキャラ名を新しく書き出す場合
+      const log_str =
+        `<span class="backlog_text ${chara_name}"><b class="backlog_chara_name ${chara_name}">${chara_name}</b>:${message_str}</span>`;
+      this.kag.pushBackLog(log_str, "add");
+
+      if (this.kag.stat.f_chara_ptext == "true") {
+        this.kag.stat.f_chara_ptext = "false";
+        this.kag.stat.log_join = "true";
+      }
+    } else {
+      // バックログにキャラ名を新しく書き出す必要がない場合
+      const log_str = `<span class="backlog_text ${chara_name}">${message_str}</span>`;
+      const join_type = should_join_log ? "join" : "add";
+      this.kag.pushBackLog(log_str,  "add");
+    }
+  };
+
+  
+    /**********************************************
+   * ↑ tyrano.plugin.kag.tag.text.pushTextToBackLog
    *********************************************/
 
   /**********************************************
