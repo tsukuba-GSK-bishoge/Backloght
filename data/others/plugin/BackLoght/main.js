@@ -746,7 +746,7 @@ bgm_over      = `true`または`false`を指定します。`true`を指定する
             console.log("〇"+String(i)+String(array_log[i]));
           } else {
             log_str += `<div class="blj_con"><span class="blj"><span class="kara">${TYRANO.kag.variable.sf.blj.pushtext}</span></span>${array_log[i]}</div>`;
-            console.log(String(i));
+            console.log("〇"+String(i)+String(array_log[i]));
           }
           //@@end
         }

@@ -8,6 +8,7 @@
 .blj{
   display: inline-flex;
   margin-right: 1.0em;
+  margin-top:0px;
   vertical-align: middle;
 }
 .kara {
@@ -16,7 +17,9 @@
 }
 .blj_con {
   display: flex;
+  /*
   margin-bottom:30px;
+  */
 }
 .backlog_text {
   display: inline;
@@ -34,4 +37,5 @@
 .blj_content {
   display: inline-block;
   vertical-align: middle;
+  margin-top:30px;
 }
